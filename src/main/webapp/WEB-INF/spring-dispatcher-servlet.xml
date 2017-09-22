@@ -32,8 +32,19 @@
         </property>
         <property name="hibernateProperties">
             <props>
+                <!-- hibernate choose correct JDBC metadata returned by the JDBC driver. -->
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <!-- write all sql statements to the console -->
                 <prop key="hibernate.show_sql">true</prop>
+                <!-- Pretty print the SQL in the log and console -->
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!-- Set a default sze for hibernate batch fetching of associations. -->
+                <prop key="hibernate.default_batch_fetch_size">16</prop>
+                <!-- Set a defaut size for entity representation for all sessions opened from Session Factory -->
+                <!--<prop key="hibernate.default_entity_mode">pojo</prop>-->
+                <!-- Hibernate will collect statistics useful for performance tuning. -->
+                <prop key="hibernate.generate_statistics">true</prop>
             </props>
         </property>
     </bean>
