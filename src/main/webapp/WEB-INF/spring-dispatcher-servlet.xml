@@ -4,7 +4,20 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/data/jpa
+       http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
     <import resource="applicationContext-service.xml"/>
     <import resource="applicationContext-dao.xml"/>
@@ -53,23 +66,42 @@
         </property>
     </bean>
 
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <!-- 注入数据库连接池 -->
+    <!--<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">-->
+    <!--&lt;!&ndash; 注入数据库连接池 &ndash;&gt;-->
+    <!--<property name="dataSource" ref="dataSource"/>-->
+    <!--&lt;!&ndash; 扫描entity 包使用别名 &ndash;&gt;-->
+    <!--<property name="typeAliasesPackage" value="com.example.pojo"/>-->
+    <!--&lt;!&ndash; 配置MyBatis全局配置文件&ndash;&gt;-->
+    <!--<property name="configLocation" value="classpath:mybatisV3-config.xml"/>-->
+    <!--&lt;!&ndash; 扫描sql配置文件:mapper需要的xml文件 &ndash;&gt;-->
+    <!--<property name="mapperLocations" value="classpath:mapper/*.xml"/>-->
+    <!--</bean>-->
+
+    <!--<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">-->
+    <!--&lt;!&ndash; 注入sqlSessionFactory &ndash;&gt;-->
+    <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>-->
+    <!--&lt;!&ndash; 给出需要扫描Dao接口包 &ndash;&gt;-->
+    <!--<property name="basePackage" value="com.example.dao"/>-->
+    <!--</bean>-->
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <!-- 扫描entity 包使用别名 -->
-        <property name="typeAliasesPackage" value="com.example.pojo"/>
-        <!-- 配置MyBatis全局配置文件-->
-        <property name="configLocation" value="classpath:mybatisV3-config.xml"/>
-        <!-- 扫描sql配置文件:mapper需要的xml文件 -->
-        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+        <property name="packagesToScan" value="com.example.pojo"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
     </bean>
 
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <!-- 注入sqlSessionFactory -->
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-        <!-- 给出需要扫描Dao接口包 -->
-        <property name="basePackage" value="com.example.dao"/>
-    </bean>
+    <jpa:repositories base-package="com.example.dao"/>
 
     <context:component-scan
             base-package="com.example.controller,com.example.scheduler,com.example.method"/>
@@ -80,6 +112,20 @@
     <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
         <property name="sessionFactory" ref="hibernate5AnnotatedSessionFactory"/>
     </bean>
+
+    <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+        <property name="caches">
+            <set>
+                <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="book"/>
+            </set>
+        </property>
+    </bean>
+
+    <cache:advice id="cacheBehaviour" cache-manager="cacheManager">
+        <cache:caching cache="book">
+
+        </cache:caching>
+    </cache:advice>
 
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver">

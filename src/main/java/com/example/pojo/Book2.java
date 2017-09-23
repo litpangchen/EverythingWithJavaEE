@@ -1,11 +1,11 @@
 package com.example.pojo;
 
-public class Book {
+public class Book2 {
     private long bookId;
     private String name;
     private int number;
 
-    public Book(
+    public Book2(
             final long bookId,
             final String name,
             final int number) {

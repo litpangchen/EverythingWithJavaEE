@@ -5,4 +5,6 @@
     <bean id="personDao" class="com.example.dao.PersonDaoImpl">
         <property name="sessionFactory" ref="hibernate5AnnotatedSessionFactory"/>
     </bean>
+
+    <bean id="bookDao" class="com.example.dao.SimpleBookRepository"/>
 </beans>

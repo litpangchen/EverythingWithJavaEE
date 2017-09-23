@@ -2,20 +2,12 @@ import com.example.pojo.Person;
 import com.example.service.PersonService;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-
+import org.springframework.stereotype.Component;
 import java.util.List;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {
-        "file:src/main/webapp/WEB-INF/spring-dispatcher-servlet.xml"
-})
-@WebAppConfiguration
-public class HibernateCRUBTest {
+@Component
+public class HibernateCRUBTest extends BaseTest {
     @Autowired
     private PersonService personService;
 
