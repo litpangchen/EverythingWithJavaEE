@@ -6,8 +6,11 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
+    <import resource="applicationContext-service.xml"/>
+    <import resource="applicationContext-dao.xml"/>
     <context:annotation-config/>
-    <!--<context:property-placeholder location="WEB-INF/classes/config.properties"/>-->
+    <context:property-placeholder location="classpath:mysql.properties"/>
+    <mvc:default-servlet-handler/>
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
@@ -16,10 +19,11 @@
     </mvc:annotation-driven>
 
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
-        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/TestDB?useSSL=false"/>
-        <property name="username" value="root"/>
-        <property name="password" value="password123"/>
+        <property name="driverClassName" value="${mysql.driverClassName}"/>
+        <property name="url" value="${mysql.url}"/>
+        <property name="username" value="${mysql.username}"/>
+        <property name="password" value="${mysql.password}"/>
+        <property name="defaultAutoCommit" value="false"/>
     </bean>
 
     <bean id="hibernate5AnnotatedSessionFactory"
@@ -42,26 +46,37 @@
                 <!-- Set a default sze for hibernate batch fetching of associations. -->
                 <prop key="hibernate.default_batch_fetch_size">16</prop>
                 <!-- Set a defaut size for entity representation for all sessions opened from Session Factory -->
-                <!--<prop key="hibernate.default_entity_mode">pojo</prop>-->
+                <prop key="hibernate.default_entity_mode">pojo</prop>
                 <!-- Hibernate will collect statistics useful for performance tuning. -->
                 <prop key="hibernate.generate_statistics">true</prop>
             </props>
         </property>
     </bean>
 
-    <bean id="personDao" class="com.example.dao.PersonDaoImpl">
-        <property name="sessionFactory" ref="hibernate5AnnotatedSessionFactory"/>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据库连接池 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 扫描entity 包使用别名 -->
+        <property name="typeAliasesPackage" value="com.example.pojo"/>
+        <!-- 配置MyBatis全局配置文件-->
+        <property name="configLocation" value="classpath:mybatisV3-config.xml"/>
+        <!-- 扫描sql配置文件:mapper需要的xml文件 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
     </bean>
 
-    <bean id="personService" class="com.example.service.PersonServiceImpl">
-        <property name="personDAO" ref="personDao"/>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 给出需要扫描Dao接口包 -->
+        <property name="basePackage" value="com.example.dao"/>
     </bean>
 
     <context:component-scan
             base-package="com.example.controller,com.example.scheduler,com.example.method"/>
 
+    <!-- 配置基于注解的声明式事务 -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
-
+    <!-- 配置事务管理器 -->
     <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
         <property name="sessionFactory" ref="hibernate5AnnotatedSessionFactory"/>
     </bean>

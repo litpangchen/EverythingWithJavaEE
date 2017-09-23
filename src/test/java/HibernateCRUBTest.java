@@ -15,7 +15,7 @@ import java.util.List;
         "file:src/main/webapp/WEB-INF/spring-dispatcher-servlet.xml"
 })
 @WebAppConfiguration
-public class HibernateGRUBTest {
+public class HibernateCRUBTest {
     @Autowired
     private PersonService personService;
 
