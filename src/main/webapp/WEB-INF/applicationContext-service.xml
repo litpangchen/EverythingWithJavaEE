@@ -5,4 +5,7 @@
     <bean id="personService" class="com.example.service.PersonServiceImpl">
         <property name="personDAO" ref="personDao"/>
     </bean>
+
+    <bean id="todoService" class="com.example.service.TodoServiceImpl">
+     </bean>
 </beans>

@@ -7,4 +7,5 @@
     </bean>
 
     <bean id="bookDao" class="com.example.dao.SimpleBookRepository"/>
+    <bean id="todoDao" class="com.example.dao.TodoDaoImpl"/>
 </beans>
