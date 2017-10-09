@@ -45,6 +45,8 @@
         <property name="annotatedClasses">
             <list>
                 <value>com.example.pojo.Person</value>
+                <value>com.example.pojo.Txn</value>
+                <value>com.example.pojo.Customer</value>
             </list>
         </property>
         <property name="hibernateProperties">
